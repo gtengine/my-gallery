@@ -10,6 +10,7 @@ import {
 import { useGallery } from "./src/use-gallery";
 import MyDropDownPicker from "./src/MyDropDownPicker";
 import TextInputModal from "./src/TextInputModal";
+import BigImageModal from "./src/BigImageModal";
 
 export default function App() {
   const {
@@ -17,9 +18,9 @@ export default function App() {
     pickImages,
     deleteImage,
     selectedAlbum,
-    modalVisible,
-    openModal,
-    closeModal,
+    textInputModalVisible,
+    openTextInputModal,
+    closeTextInputModal,
     albumTitle,
     setAlbumTitle,
     addAlbum,
@@ -29,6 +30,12 @@ export default function App() {
     closeDropDown,
     albums,
     selectAlbum,
+    deleteAlbum,
+    bigImageModalVisible,
+    openBigImageModal,
+    closeBigImageModal,
+    selectedImage,
+    selectImage,
   } = useGallery();
 
   const width = Dimensions.get("screen").width;
@@ -41,17 +48,18 @@ export default function App() {
   const onLongPressImage = (imageId) => deleteImage(imageId);
 
   const onPressAddAlbum = () => {
-    openModal();
+    openTextInputModal();
   };
 
   const onSubmitEditing = () => {
     if (!albumTitle) return;
     addAlbum();
-    closeModal();
+    closeTextInputModal();
     resetAlbumTitle();
   };
 
-  const onPressBackdrop = () => closeModal();
+  const onPressTextInputModalBackdrop = () => closeTextInputModal();
+  const onPressBigImageModalBackdrop = () => closeBigImageModal();
 
   const onPressHeader = () => {
     if (isOpenDropDown) {
@@ -66,7 +74,17 @@ export default function App() {
     closeDropDown();
   };
 
-  const renderItem = ({ item: { id, uri }, index }) => {
+  const onLongPressAlbum = (albumId) => {
+    deleteAlbum(albumId);
+  };
+
+  const onPressImage = (image) => {
+    selectImage(image);
+    openBigImageModal();
+  };
+
+  const renderItem = ({ item: image, index }) => {
+    const { id, uri } = image;
     if (id === -1) {
       return (
         <TouchableOpacity
@@ -84,7 +102,10 @@ export default function App() {
       );
     }
     return (
-      <TouchableOpacity onLongPress={() => onLongPressImage(id)}>
+      <TouchableOpacity
+        onLongPress={() => onLongPressImage(id)}
+        onPress={() => onPressImage(image)}
+      >
         <Image
           source={{ uri }}
           style={{ width: columnSize, height: columnSize }}
@@ -103,15 +124,23 @@ export default function App() {
         isOpenDropDown={isOpenDropDown}
         albums={albums}
         onPressAlbum={onPressAlbum}
+        onLongPressAlbum={onLongPressAlbum}
       />
 
       {/* 앨범을 추가하는 TextInputModal */}
       <TextInputModal
-        modalVisible={modalVisible}
+        modalVisible={textInputModalVisible}
         albumTitle={albumTitle}
         setAlbumTitle={setAlbumTitle}
         onSubmitEditing={onSubmitEditing}
-        onPressBackdrop={onPressBackdrop}
+        onPressBackdrop={onPressTextInputModalBackdrop}
+      />
+
+      {/* 이미지 확대 모달 */}
+      <BigImageModal
+        modalVisible={bigImageModalVisible}
+        onPressBackdrop={onPressBigImageModalBackdrop}
+        selectedImage={selectedImage}
       />
 
       {/* 이미지 리스트 */}

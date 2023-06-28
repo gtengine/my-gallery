@@ -11,9 +11,11 @@ export const useGallery = () => {
   const [images, setImages] = useState([]);
   const [selectedAlbum, setSelectedAlbum] = useState(defaultAlbum);
   const [albums, setAlbums] = useState([defaultAlbum]);
-  const [modalVisible, setModalVisible] = useState(false);
   const [albumTitle, setAlbumTitle] = useState("");
   const [isOpenDropDown, setIsOpenDropDown] = useState(false);
+  const [textInputModalVisible, setTextInputModalVisible] = useState(false);
+  const [bigImageModalVisible, setBigImageModalVisible] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const pickImages = async () => {
     // No permissions request is necessary for launching the image library
@@ -53,6 +55,10 @@ export const useGallery = () => {
     ]);
   };
 
+  const selectImage = (image) => {
+    setSelectedImage(image);
+  };
+
   const filteredImages = images.filter(
     (image) => image.albumId === selectedAlbum.id
   );
@@ -71,17 +77,42 @@ export const useGallery = () => {
       title: albumTitle,
     };
     setAlbums([...albums, newAlbum]);
+    setSelectedAlbum(newAlbum);
   };
 
   const resetAlbumTitle = () => setAlbumTitle("");
 
-  const openModal = () => setModalVisible(true);
-  const closeModal = () => setModalVisible(false);
+  const openTextInputModal = () => setTextInputModalVisible(true);
+  const closeTextInputModal = () => setTextInputModalVisible(false);
   const openDropDown = () => setIsOpenDropDown(true);
   const closeDropDown = () => setIsOpenDropDown(false);
 
+  const openBigImageModal = () => setBigImageModalVisible(true);
+  const closeBigImageModal = () => setBigImageModalVisible(false);
+
   const selectAlbum = (album) => {
     setSelectedAlbum(album);
+  };
+
+  const deleteAlbum = (albumId) => {
+    if (albumId === defaultAlbum.id) {
+      Alert.alert("기본 앨범은 삭제할 수 없습니다.");
+      return;
+    }
+    Alert.alert("앨범을 삭제하시겠습니까?", "", [
+      {
+        style: "cancel",
+        text: "아니요",
+      },
+      {
+        text: "네",
+        onPress: () => {
+          const newAlbums = albums.filter((album) => album.id !== albumId);
+          setAlbums(newAlbums);
+          setSelectedAlbum(defaultAlbum);
+        },
+      },
+    ]);
   };
 
   return {
@@ -90,9 +121,9 @@ export const useGallery = () => {
     pickImages,
     deleteImage,
     selectedAlbum,
-    modalVisible,
-    openModal,
-    closeModal,
+    textInputModalVisible,
+    openTextInputModal,
+    closeTextInputModal,
     albumTitle,
     setAlbumTitle,
     addAlbum,
@@ -102,5 +133,11 @@ export const useGallery = () => {
     closeDropDown,
     albums,
     selectAlbum,
+    deleteAlbum,
+    bigImageModalVisible,
+    openBigImageModal,
+    closeBigImageModal,
+    selectedImage,
+    selectImage,
   };
 };

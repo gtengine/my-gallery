@@ -10,6 +10,7 @@ export default ({
   isOpenDropDown,
   albums,
   onPressAlbum,
+  onLongPressAlbum,
 }) => {
   return (
     <View>
@@ -69,7 +70,9 @@ export default ({
                   alignItems: "center",
                   backgroundColor: "#FFFFFF",
                 }}
+                activeOpacity={1}
                 onPress={() => onPressAlbum(album)}
+                onLongPress={() => onLongPressAlbum(album.id)}
               >
                 <Text
                   style={{ fontWeight: isSelectedAlbum ? "bold" : undefined }}
