@@ -1,10 +1,16 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert } from "react-native";
 
 const defaultAlbum = {
   id: 1,
   title: "기본",
+};
+
+const ASYNC_KEY = {
+  IMAGES: "images",
+  ALBUMS: "albums",
 };
 
 export const useGallery = () => {
@@ -16,6 +22,16 @@ export const useGallery = () => {
   const [textInputModalVisible, setTextInputModalVisible] = useState(false);
   const [bigImageModalVisible, setBigImageModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+
+  const _setImages = (newImages) => {
+    setImages(newImages);
+    AsyncStorage.setItem(ASYNC_KEY.IMAGES, JSON.stringify(newImages));
+  };
+
+  const _setAlbums = (newAlbums) => {
+    setAlbums(newAlbums);
+    AsyncStorage.setItem(ASYNC_KEY.ALBUMS, JSON.stringify(newAlbums));
+  };
 
   const pickImages = async () => {
     // No permissions request is necessary for launching the image library
@@ -33,7 +49,7 @@ export const useGallery = () => {
         uri: result.assets[0].uri,
         albumId: selectedAlbum.id,
       };
-      setImages([...images, newImage]);
+      _setImages([...images, newImage]);
     }
   };
 
@@ -47,7 +63,7 @@ export const useGallery = () => {
         text: "네",
         onPress: () => {
           const newImages = images.filter((image) => image.id !== imageId);
-          setImages(newImages);
+          _setImages(newImages);
         },
       },
     ]);
@@ -106,7 +122,7 @@ export const useGallery = () => {
       id: lastId + 1,
       title: albumTitle,
     };
-    setAlbums([...albums, newAlbum]);
+    _setAlbums([...albums, newAlbum]);
     setSelectedAlbum(newAlbum);
   };
 
@@ -138,12 +154,30 @@ export const useGallery = () => {
         text: "네",
         onPress: () => {
           const newAlbums = albums.filter((album) => album.id !== albumId);
-          setAlbums(newAlbums);
+          _setAlbums(newAlbums);
           setSelectedAlbum(defaultAlbum);
         },
       },
     ]);
   };
+
+  const initValues = async () => {
+    const imagesFromAsyncStorage = await AsyncStorage.getItem(ASYNC_KEY.IMAGES);
+    if (imagesFromAsyncStorage !== null) {
+      const parsed = JSON.parse(imagesFromAsyncStorage);
+      setImages(parsed);
+    }
+
+    const albumsFromAsyncStorage = await AsyncStorage.getItem(ASYNC_KEY.ALBUMS);
+    if (albumsFromAsyncStorage !== null) {
+      const parsed = JSON.parse(albumsFromAsyncStorage);
+      setAlbums(parsed);
+    }
+  };
+
+  useEffect(() => {
+    initValues();
+  }, []);
 
   return {
     images,

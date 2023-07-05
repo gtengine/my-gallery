@@ -1,4 +1,5 @@
 import {
+  Alert,
   Dimensions,
   FlatList,
   Image,
@@ -51,8 +52,25 @@ export default function App() {
 
   const onLongPressImage = (imageId) => deleteImage(imageId);
 
+  const onPressWatchAd = () => {
+    console.log("ad");
+  };
+
   const onPressAddAlbum = () => {
-    openTextInputModal();
+    if (albums.length >= 2) {
+      Alert.alert("앨범 추가 생성은 광고를 시청해야 합니다.", "", [
+        {
+          style: "cancel",
+          text: "닫기",
+        },
+        {
+          text: "광고 보기",
+          onPress: onPressWatchAd,
+        },
+      ]);
+    } else {
+      openTextInputModal();
+    }
   };
 
   const onSubmitEditing = () => {
