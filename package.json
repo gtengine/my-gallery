@@ -12,7 +12,6 @@
     "@expo/ngrok": "^4.1.0",
     "@react-native-async-storage/async-storage": "1.17.11",
     "expo": "^48.0.0",
-    "expo-ads-admob": "~13.0.0",
     "expo-image-picker": "~14.1.1",
     "expo-status-bar": "~1.4.4",
     "react": "18.2.0",
